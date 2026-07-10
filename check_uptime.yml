@@ -3,7 +3,7 @@
   gather_facts: false
   tasks:
     - name: Get server uptime
-      ansible.builtin.shell: uptimeee -p
+      ansible.builtin.shell: uptime -p
       register: uptime_result
       changed_when: false
       ignore_errors: true  # CRITICAL: Allows the playbook to continue if this command fails

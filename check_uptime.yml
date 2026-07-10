@@ -10,3 +10,16 @@
     - name: Display server uptime
       ansible.builtin.debug:
         msg: "{{ inventory_hostname }} Uptime -> {{ uptime_result.stdout }}"
+    - name: publish artifact for success
+      ansible.builtin.set_stats:
+        data:
+          uptime: "{{ uptime_result.stdout }}"
+          hostname: "{{ inventory_hostname }}"
+          status: "SUCCESS"
+    - name: publish artifact for failure
+      when: uptime_result is failed
+      ansible.builtin.set_stats:
+        data:
+          uptime: "{{ uptime_result.stdout }}"
+          hostname: "{{ inventory_hostname }}"
+          status: "FAILURE"

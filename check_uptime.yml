@@ -6,20 +6,25 @@
       ansible.builtin.shell: uptime -p
       register: uptime_result
       changed_when: false
+      ignore_errors: true  # CRITICAL: Allows the playbook to continue if this command fails
 
     - name: Display server uptime
       ansible.builtin.debug:
-        msg: "{{ inventory_hostname }} Uptime -> {{ uptime_result.stdout }}"
-    - name: publish artifact for success
+        msg: "{{ inventory_hostname }} Uptime -> {{ uptime_result.stdout | default('N/A') }}"
+      when: uptime_result is succeeded
+
+    - name: Publish artifact for success
+      when: uptime_result is succeeded
       ansible.builtin.set_stats:
         data:
           uptime: "{{ uptime_result.stdout }}"
           hostname: "{{ inventory_hostname }}"
           status: "SUCCESS"
-    - name: publish artifact for failure
+
+    - name: Publish artifact for failure
       when: uptime_result is failed
       ansible.builtin.set_stats:
         data:
-          uptime: "{{ uptime_result.stdout }}"
+          uptime: "Error retrieving uptime"
           hostname: "{{ inventory_hostname }}"
           status: "FAILURE"
